@@ -1,0 +1,177 @@
+Step by step code for mental heatlh tracker
+
+Step 1: Setup Flask App
+
+```python
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mental_health.db'
+db = SQLAlchemy(app)
+
+# Define the Mood model
+class Mood(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    mood = db.Column(db.String(50), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Mood %r>' % self.id
+
+# Create the database
+db.create_all()
+
+# Routes
+@app.route('/')
+def index():
+    moods = Mood.query.order_by(Mood.date_created.desc()).all()
+    return render_template('index.html', moods=moods)
+
+@app.route('/add', methods=['POST'])
+def add_mood():
+    mood = request.form['mood']
+    new_mood = Mood(mood=mood)
+
+    try:
+        db.session.add(new_mood)
+        db.session.commit()
+        return redirect('/')
+    except:
+        return 'There was an issue adding your mood.'
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+Step 2: HTML Templates (index.html)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Tracker</title>
+</head>
+<body>
+    <h1>Mental Health Tracker</h1>
+    
+    <form action="/add" method="POST">
+        <label for="mood">Enter your mood:</label>
+        <input type="text" id="mood" name="mood" required>
+        <button type="submit">Add Mood</button>
+    </form>
+
+    <h2>Recent Moods:</h2>
+    <ul>
+        {% for mood in moods %}
+        <li>{{ mood.mood }} - {{ mood.date_created.strftime('%Y-%m-%d %H:%M:%S') }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+Step 3: Running the App
+
+1. Ensure you have Python installed on your system.
+2. Install Flask and SQLAlchemy using `pip install flask sqlalchemy`.
+3. Save the Python code into a file (`app.py` for example).
+4. Save the HTML code into a directory named `templates` in the same directory as your Python file.
+
+Explanation:
+
+- Flask Setup: Initializes a Flask app and sets up a SQLite database (`mental_health.db`) using SQLAlchemy.
+- Mood Model: Defines a `Mood` class with fields for `id`, `mood`, and `date_created`.
+- Routes:
+  - `/`: Renders the main page (`index.html`) showing recent moods.
+  - `/add`: Handles POST requests to add a new mood entry to the database.
+- HTML Template: Provides a simple form to submit moods and displays recent entries.
+
+Enhancements:
+
+- User Authentication: Implement user accounts for personalized tracking.
+- Graphical Data Visualization: Use libraries like Plotly or D3.js to visualize mood trends over time.
+- Reminder Notifications: Integrate with a notification service to remind users to log their mood daily.
+
+This example provides a basic structure. Depending on your requirements, you may need to expand functionality or add features like data analytics, privacy controls, or external API integrations.
+
+
+
+
+
+
+flask code:
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mental_health.db'
+db = SQLAlchemy(app)
+
+# Define the Mood model
+class Mood(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    mood = db.Column(db.String(50), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Mood %r>' % self.id
+
+# Create the database
+db.create_all()
+
+# Routes
+@app.route('/')
+def index():
+    moods = Mood.query.order_by(Mood.date_created.desc()).all()
+    return render_template('index.html', moods=moods)
+
+@app.route('/add', methods=['POST'])
+def add_mood():
+    mood = request.form['mood']
+    new_mood = Mood(mood=mood)
+
+    try:
+        db.session.add(new_mood)
+        db.session.commit()
+        return redirect('/')
+    except:
+        return 'There was an issue adding your mood.'
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
+
+
+Html template code:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Tracker</title>
+</head>
+<body>
+    <h1>Mental Health Tracker</h1>
+    
+    <form action="/add" method="POST">
+        <label for="mood">Enter your mood:</label>
+        <input type="text" id="mood" name="mood" required>
+        <button type="submit">Add Mood</button>
+    </form>
+
+    <h2>Recent Moods:</h2>
+    <ul>
+        {% for mood in moods %}
+        <li>{{ mood.mood }} - {{ mood.date_created.strftime('%Y-%m-%d %H:%M:%S') }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html
